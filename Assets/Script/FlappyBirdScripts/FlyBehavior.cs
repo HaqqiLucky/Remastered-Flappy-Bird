@@ -3,34 +3,30 @@ using UnityEngine.InputSystem;
 
 public class FlyBehavior : MonoBehaviour
 {
+    [SerializeField] private InputActionReference loncat;
     [SerializeField] private float velocity = 1.5f;
     [SerializeField] private float rotationSpeed = 10f;
     private Rigidbody2D rb;
 
-    private void Awake()
+    void OnEnable()
     {
-        
+        loncat.action.Enable();
+        loncat.action.performed += OnJump;
+    }
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    private void FixedUpdate()
+    void OnDisable()
     {
-        transform.rotation = Quaternion.Euler(0, 0, rb.linearVelocityY * rotationSpeed);
+        loncat.action.performed -= OnJump;
+        loncat.action.Disable();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void OnJump(InputAction.CallbackContext callbackContext)
     {
-        rb = this.gameObject.GetComponent<Rigidbody2D>();
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            rb.linearVelocity = Vector2.up * velocity;
-        }
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, velocity);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
